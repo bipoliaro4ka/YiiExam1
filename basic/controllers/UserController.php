@@ -2,9 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\Request;
 use app\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -31,6 +33,22 @@ class UserController extends Controller
                         'delete' => ['POST'],
                     ],
                 ],
+                'access' => [
+                    'class' => AccessControl::className(),
+                    'only' => ['create', 'index'],
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'actions' => ['create' ],
+                            'roles' => ['?'],
+                        ],
+                        [
+                            'allow' => true,
+                            'actions' => ['index'],
+                            'roles' => ['@']
+                        ],
+                    ],
+                ],
             ]
         );
     }
@@ -43,7 +61,7 @@ class UserController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => User::find(),
+            'query' => Request::find()->where(['id_user'=> Yii::$app->user->getId()]),
             /*
             'pagination' => [
                 'pageSize' => 50
